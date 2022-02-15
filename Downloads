@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Automaton Name="G1">
+	<States>
+		<State Name="0" Marking="Unmarked" Id="0" />
+		<State Name="1" Marking="Unmarked" Id="1" />
+		<State Name="2" Marking="Unmarked" Id="2" />
+		<State Name="3" Marking="Unmarked" Id="3" />
+		<State Name="4" Marking="Unmarked" Id="4" />
+		<State Name="5" Marking="Unmarked" Id="5" />
+	</States>
+	<InitialState Id="0" />
+	<Events>
+		<Event Name="G" Controllability="Controllable" Id="0" />
+		<Event Name="T" Controllability="Controllable" Id="1" />
+		<Event Name="C" Controllability="Controllable" Id="2" />
+	</Events>
+	<Transitions>
+		<Transition Origin="0" Trigger="0" Destination="1" />
+		<Transition Origin="1" Trigger="1" Destination="2" />
+		<Transition Origin="2" Trigger="2" Destination="3" />
+		<Transition Origin="3" Trigger="2" Destination="4" />
+		<Transition Origin="4" Trigger="1" Destination="5" />
+	</Transitions>
+</Automaton>

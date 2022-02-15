@@ -10,6 +10,8 @@ from random import choice
 
 from ultrades.automata import *
 
+possibleEvents = ["A", "T", "C", "G"];
+
 def getEvent(eventName):
     if eventName == "A":
             return event("A", controllable=True)
@@ -22,9 +24,23 @@ def getEvent(eventName):
     else:
         return
 
-def createTransition(prevState, event, nextState):
+def getTransitionData(prevState, event, nextState):
     return (prevState, event, nextState)
 
+def createTransitions(prevState, events, nextState):
+    transitions = []
+    for event in events:
+        transitions.append(getTransitionData(prevState, getEvent(event), nextState))
+    
+    return transitions
+
+def otherEvents(events):
+    eventsCopy = possibleEvents
+    for event in eventsCopy:
+        if(event in events):
+            eventsCopy.remove(event)
+    return eventsCopy
+    
 
 def createDnaSearcherAutomaton(sequence):
     automatonTransitions = []
@@ -40,13 +56,34 @@ def createDnaSearcherAutomaton(sequence):
 
     allStates.append(lastState)
     
-    for index in range(len(sequence)):
-        transition = createTransition(allStates[index], getEvent(sequence[index]), allStates[index + 1])
+    for index in range(len(sequence) + 1):
+        prevState = allStates[index]
+        nextState = allStates[index + 1]
+        
+
+        currentEvent = getEvent(sequence[index - 1])
+        transition = getTransitionData(prevState, currentEvent, nextState)
         automatonTransitions.append(transition)
-        # print(transition, sequence[index])
+        
+        if(index == 0):
+            automatonTransitions.extend(createTransitions(prevState, otherEvents(sequence[index - 1]), prevState))
+        elif(index == 1):
+            automatonTransitions.append(getTransitionData(prevState, getEvent(sequence[0]), prevState))
+            automatonTransitions.extend(createTransitions(prevState, otherEvents([sequence[0], sequence[1]]), allStates[index - 1]))
+        elif(index == (len(sequence) - 1)):
+            automatonTransitions.append(getTransitionData(prevState, getEvent(sequence[0]), allStates[1]))
+            automatonTransitions.extend(createTransitions(prevState, otherEvents(sequence[0]), allStates[0]))
+        # else:
+        #     automatonTransitions.append(getTransitionData(prevState, getEvent(sequence[0]), allStates[0]))
+        #     automatonTransitions.extend(createTransitions(prevState, otherEvents([sequence[0], sequence[index -1]]), allStates[0]))
+            
+        
+    # print(automatonTransitions)
+    
+    print(len(sequence), sequence)
 
     G1 = dfa(automatonTransitions, firstState, "G1")
-    print(transitions(G1))
+
     return G1
 
 
@@ -57,8 +94,7 @@ def dnaSample(length):
         DNA += choice ("CGTA")
     return DNA
 
-dnaForTest = dnaSample(500)
-# print(dnaForTest)
+dnaForTest = dnaSample(4)
 
 s1 = state("s1", marked = True)
 s2 = state("s2", marked = False)
@@ -82,6 +118,9 @@ G2 = dfa(
 
 Gp = parallel_composition(G1, G2)
 
-show_automaton(Gp)
+g = createDnaSearcherAutomaton(dnaForTest)
+# write_xml(g, r"C:\Users\mrluc\Downloads")
+automatonImage = show_automaton(g)
 
-print(createDnaSearcherAutomaton(dnaSample(5)))
+print(dnaForTest)
+print(automatonImage.data)
