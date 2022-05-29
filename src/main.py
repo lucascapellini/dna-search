@@ -10,7 +10,7 @@ from random import choice
 
 from ultrades.automata import *
 
-possibleEvents = ["A", "T", "C", "G"];
+possibleEvents = ["A", "T", "C", "G"]
 
 def getEvent(eventName):
     if eventName == "A":
@@ -46,41 +46,41 @@ def createDnaSearcherAutomaton(sequence):
     automatonTransitions = []
 
     firstState = state("0", marked=False)
-    lastState = state(str(len(sequence) + 1), marked=True)
+    # lastState = state(str(len(sequence)), marked=True)
     allStates = []
 
     allStates.append(firstState)
     
     for index in range(len(sequence)):
-        allStates.append(state(str(index + 1), marked=False))
+        index += 1
+        if(index == (len(sequence))):
+            allStates.append(state(str(index), marked=True))
+        else:
+            allStates.append(state(str(index), marked=False))
 
-    allStates.append(lastState)
     
-    for index in range(len(sequence) + 1):
-        prevState = allStates[index]
+    print(len(allStates))
+    
+    for index in range(len(sequence)):
+        currentState = allStates[index]
         nextState = allStates[index + 1]
         
-
-        currentEvent = getEvent(sequence[index - 1])
-        transition = getTransitionData(prevState, currentEvent, nextState)
+        currentEvent = getEvent(sequence[index])
+        transition = getTransitionData(currentState, currentEvent, nextState)
         automatonTransitions.append(transition)
         
-        if(index == 0):
-            automatonTransitions.extend(createTransitions(prevState, otherEvents(sequence[index - 1]), prevState))
-        elif(index == 1):
-            automatonTransitions.append(getTransitionData(prevState, getEvent(sequence[0]), prevState))
-            automatonTransitions.extend(createTransitions(prevState, otherEvents([sequence[0], sequence[1]]), allStates[index - 1]))
-        elif(index == (len(sequence) - 1)):
-            automatonTransitions.append(getTransitionData(prevState, getEvent(sequence[0]), allStates[1]))
-            automatonTransitions.extend(createTransitions(prevState, otherEvents(sequence[0]), allStates[0]))
-        # else:
-        #     automatonTransitions.append(getTransitionData(prevState, getEvent(sequence[0]), allStates[0]))
-        #     automatonTransitions.extend(createTransitions(prevState, otherEvents([sequence[0], sequence[index -1]]), allStates[0]))
-            
+        print(currentState, nextState, index)
         
-    # print(automatonTransitions)
-    
-    print(len(sequence), sequence)
+
+        if(index == 1):
+            automatonTransitions.extend(createTransitions(currentState, otherEvents([sequence[1], sequence[0]]), allStates[index - 1]))
+            automatonTransitions.append(getTransitionData(currentState, getEvent(sequence[0]), currentState))
+        else:
+            automatonTransitions.extend(createTransitions(currentState, otherEvents([sequence[index], sequence[0]]), allStates[0]))
+            automatonTransitions.append(getTransitionData(currentState, getEvent(sequence[0]), allStates[1]))
+            
+            
+
 
     G1 = dfa(automatonTransitions, firstState, "G1")
 
