@@ -35,8 +35,9 @@ def createTransitions(prevState, events, nextState):
     return transitions
 
 def otherEvents(events):
-    eventsCopy = possibleEvents
-    for event in eventsCopy:
+    eventsCopy = ["A", "C", "G", "T"]
+    for event in ["A", "C", "G", "T"]:
+        print(events, event, eventsCopy)
         if(event in events):
             eventsCopy.remove(event)
     return eventsCopy
@@ -59,7 +60,7 @@ def createDnaSearcherAutomaton(sequence):
             allStates.append(state(str(index), marked=False))
 
     
-    print(len(allStates))
+    # print(len(allStates))
     
     for index in range(len(sequence)):
         currentState = allStates[index]
@@ -79,14 +80,21 @@ def createDnaSearcherAutomaton(sequence):
             automatonTransitions.extend(createTransitions(currentState, otherEvents([sequence[index], sequence[0]]), allStates[0]))
             automatonTransitions.append(getTransitionData(currentState, getEvent(sequence[0]), allStates[1]))
             
-            
+    automatonTransitions.extend(createTransitions(allStates[len(allStates) - 1], otherEvents([sequence[0], sequence[len(sequence) - 1]]), allStates[0]))
 
 
     G1 = dfa(automatonTransitions, firstState, "G1")
 
     return G1
 
-
+def formatSequence(originalSequence: str):
+    dnasList = list(originalSequence)
+    
+    for index in range(len(dnasList)):
+        if(dnasList[0] == dnasList[1]):
+            dnasList.remove(dnasList[0])
+    
+    return "".join(dnasList)
 
 def dnaSample(length):
     DNA = ""
@@ -94,33 +102,18 @@ def dnaSample(length):
         DNA += choice ("CGTA")
     return DNA
 
-dnaForTest = dnaSample(4)
+# dnaForTest = dnaSample(4)
 
-s1 = state("s1", marked = True)
-s2 = state("s2", marked = False)
-
-e1 = event("e1", controllable = True)
-e2 = event("e2", controllable = False)
-e3 = event("e3", controllable = True)
-e4 = event("e4", controllable = False)
-
-G1 = dfa(
-[
-    (s1, e1, s2), 
-    (s2, e2, s1)
-], s1, "G1")
+dnaForTest = "AACCGATTCCGA"
   
-G2 = dfa(
-[
-    (s1, e3, s2), 
-    (s2, e4, s1)
-], s1, "G2")
+print(dnaForTest)
 
-Gp = parallel_composition(G1, G2)
+formatedDNASequence = formatSequence(dnaForTest)
 
-g = createDnaSearcherAutomaton(dnaForTest)
-# write_xml(g, r"C:\Users\mrluc\Downloads")
+print(formatedDNASequence)
+g = createDnaSearcherAutomaton(formatedDNASequence)
+
+
 automatonImage = show_automaton(g)
 
-print(dnaForTest)
 print(automatonImage.data)
