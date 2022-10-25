@@ -154,7 +154,7 @@ def dnaSample(length):
 # dnaForTest = dnaSample(4)
 
 dnaToFind = "AACCT"
-dna = "AAACCT" + dnaSample(5555) + "GAAACCTG"
+dna = "AAACCT" + dnaSample(54) + "GAAACCTG"
   
 print(dnaToFind, dna)
 
