@@ -7,6 +7,7 @@ import ultrades
 sys.path.append(os.path.dirname(ultrades.__file__))
 import re
 from random import choice
+import time
 
 from ultrades.automata import *
 
@@ -85,11 +86,11 @@ def createDnaSearcherAutomaton(sequence):
             break
     
     formattedSequence = "".join(dnasList)
-    print("formattedSequence and dnasList", formattedSequence, dnasList)
+    #print("formattedSequence and dnasList", formattedSequence, dnasList)
     
     for index in range(len(formattedSequence) - repeatsFirstPosition):
         offSetIndex = index + repeatsFirstPosition
-        print("offsetIndex", offSetIndex, repeatsFirstPosition, formattedSequence[offSetIndex])
+        #print("offsetIndex", offSetIndex, repeatsFirstPosition, formattedSequence[offSetIndex])
         currentState = allStates[offSetIndex]
         nextState = allStates[offSetIndex + 1]
         
@@ -151,24 +152,31 @@ def dnaSample(length):
         DNA += choice ("CGTA")
     return DNA
 
-# dnaForTest = dnaSample(4)
+startTime = time.process_time() 
+print("Início da execução - Gerando DNA", startTime)
 
-dnaToFind = "AACCT"
-dna = "AAACCT" + dnaSample(54) + "GAAACCTG"
-  
-print(dnaToFind, dna)
+dnaToFind = dnaSample(4)
+dna = dnaToFind + dnaToFind + dnaSample(1000000) + dnaToFind + "AA"
+
+print("Genoma: ", dna, "DNA satélite:", dnaToFind)
+
+print("Criando autômato para buscar DNA satélite")
 
 # formatedDNASequence = formatSequence(dnaToFind)
 
 g1 = createDnaSearcherAutomaton(dnaToFind)
+
+print("Criando autômato do genoma a ser encontrado")
+
 g2 = createDNASequence(dna)
+
+print("Fazendo a composição paralela entre os autômatos")
 
 gp = parallel_composition(g1,g2)
 
 # print(gp)
 
 def findMatch(automataResult: str):
-    print("autromatonResult", automataResult)
     positinToBeginSearch = automataResult.find("node [shape = circle];")
     positionToFinishSearch = automataResult.find("node [shape = point ]")
     # print("splitResult", automataResult[positinToBeginSearch:positionToFinishSearch])
@@ -183,6 +191,9 @@ def findMatch(automataResult: str):
         positionOfSlash = state.find("|")
         lastNumberCharacter = len(state) - 1
         
+        if(len(state) > 1 and state[1].isnumeric()):
+            print(state[1], len(dnaToFind))
+            
         if(len(state) > 1 and state[1].isnumeric() and int(state[1]) == (len(dnaToFind))):
             statesWithDna.append(state[positionOfSlash + 1:lastNumberCharacter])
             # print("CHEGOUUU", state, statesWithDna[1:])
@@ -192,6 +203,11 @@ def findMatch(automataResult: str):
         
 
 automatonImage = show_automaton(gp)
+
+print("Autômato gerado após composição paralela", automatonImage.data)
+
 print("Posições encontradas", findMatch(automatonImage.data))
+
+print("Tempo de execução: ", time.process_time() - startTime )
 
 # print(automatonImage.data)
