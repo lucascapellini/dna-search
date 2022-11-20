@@ -155,10 +155,13 @@ def dnaSample(length):
 startTime = time.process_time() 
 print("Início da execução - Gerando DNA", startTime)
 
-dnaToFind = dnaSample(4)
-dna = dnaToFind + dnaToFind + dnaSample(1000000) + dnaToFind + "AA"
+dnaToFind = "ACAGGGGTGTGGGG"
+# print(dnaSample(10000))
+#dna = dnaToFind + dnaToFind + dnaSample(100) + dnaToFind + "AA"
+file = open("genoma.fasta", "r")
+dna = file.read()
 
-print("Genoma: ", dna, "DNA satélite:", dnaToFind)
+print("Tamanho do genoma: ", len(dna), "DNA satélite:", dnaToFind)
 
 print("Criando autômato para buscar DNA satélite")
 
@@ -191,8 +194,8 @@ def findMatch(automataResult: str):
         positionOfSlash = state.find("|")
         lastNumberCharacter = len(state) - 1
         
-        if(len(state) > 1 and state[1].isnumeric()):
-            print(state[1], len(dnaToFind))
+        # if(len(state) > 1 and state[1].isnumeric()):
+            # print(state[1], len(dnaToFind))
             
         if(len(state) > 1 and state[1].isnumeric() and int(state[1]) == (len(dnaToFind))):
             statesWithDna.append(state[positionOfSlash + 1:lastNumberCharacter])
@@ -204,7 +207,10 @@ def findMatch(automataResult: str):
 
 automatonImage = show_automaton(gp)
 
-print("Autômato gerado após composição paralela", automatonImage.data)
+automatonStates = states(g1)
+print("states g1", automatonStates)
+
+print("Autômato gerado após composição paralela", states(gp))
 
 print("Posições encontradas", findMatch(automatonImage.data))
 
